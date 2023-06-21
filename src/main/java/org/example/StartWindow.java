@@ -15,8 +15,8 @@ public class StartWindow extends JFrame {
         this.setTitle("InfoBot");
 
         JPanel jPanel = new JPanel();
-        jPanel.setVisible(true);
         jPanel.setBackground(new Color(0x00FFB8));
+        jPanel.setSize(width,height);
 
         this.add(jPanel);
     }
