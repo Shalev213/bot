@@ -1,27 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<bb:project xmlns:bb="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <bb:modelVersion>4.0.0</bb:modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>bot</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <bb:groupId>org.example</bb:groupId>
+    <bb:artifactId>bot</bb:artifactId>
+    <bb:version>1.0-SNAPSHOT</bb:version>
 
-    <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <bb:properties>
+        <bb:maven.compiler.source>19</bb:maven.compiler.source>
+        <bb:maven.compiler.target>19</bb:maven.compiler.target>
+        <bb:project.build.sourceEncoding>UTF-8</bb:project.build.sourceEncoding>
+    </bb:properties>
 
-    <dependencies>
+    <bb:dependencies>
         <!-- https://mvnrepository.com/artifact/org.telegram/telegrambots -->
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots</artifactId>
-            <version>6.1.0</version>
-        </dependency>
+        <bb:dependency>
+            <bb:groupId>org.telegram</bb:groupId>
+            <bb:artifactId>telegrambots</bb:artifactId>
+            <bb:version>6.1.0</bb:version>
+        </bb:dependency>
 
-    </dependencies>
+        <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
+        <bb:dependency>
+            <bb:groupId>com.mashape.unirest</bb:groupId>
+            <bb:artifactId>unirest-java</bb:artifactId>
+            <bb:version>1.4.9</bb:version>
+        </bb:dependency>
 
-</project>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <bb:dependency>
+            <bb:groupId>com.fasterxml.jackson.core</bb:groupId>
+            <bb:artifactId>jackson-databind</bb:artifactId>
+            <bb:version>2.15.2</bb:version>
+        </bb:dependency>
+
+        <bb:dependency>
+            <bb:groupId>org.apache.httpcomponents</bb:groupId>
+            <bb:artifactId>httpclient</bb:artifactId>
+            <bb:version>4.5.13</bb:version>
+        </bb:dependency>
+
+        <bb:dependency>
+            <bb:groupId>io.quickchart</bb:groupId>
+            <bb:artifactId>quickchart-java</bb:artifactId>
+            <bb:version>1.3.0</bb:version>
+        </bb:dependency>
+
+
+
+
+    </bb:dependencies>
+
+</bb:project>
