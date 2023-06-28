@@ -7,8 +7,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
@@ -30,6 +28,7 @@ public class InfoBot extends TelegramLongPollingBot {
     private CountriesModel countriesModel;
     private String activeUserName ="No one";
     private Long chatId;
+    private  String countryName ="ISR";
     private final static List<String> selectedCheckBoxesToString = new ArrayList<>();
 
     public static List<String> getSelectedCheckBoxesToString(){
@@ -40,32 +39,37 @@ public class InfoBot extends TelegramLongPollingBot {
     public InfoBot() throws Exception{
         this.uniqueUserMap = new HashMap<>();
         this.userMessageCounts = new HashMap<>();
+ new Thread(()-> {
+     try {
+         HttpResponse<String> countries = Unirest.get("https://restcountries.com/v2/alpha/" + countryName).asString();
+         ObjectMapper objectMapper1 = new ObjectMapper();
+         countriesModel =objectMapper1.readValue(countries.getBody(), CountriesModel.class);
+         // System.out.println(countriesModel.getName() + ": capital- " + countriesModel.getCapital() + ", population- " +countriesModel.getPopulation());
 
-        String string ="FRA";
-        HttpResponse<String> countries = Unirest.get("https://restcountries.com/v2/alpha/" + string).asString();
-        ObjectMapper objectMapper1 = new ObjectMapper();
-        countriesModel =objectMapper1.readValue(countries.getBody(), CountriesModel.class);
-        // System.out.println(countriesModel.getName() + ": capital- " + countriesModel.getCapital() + ", population- " +countriesModel.getPopulation());
+         HttpResponse<String> quotes = Unirest.get("https://api.quotable.io/random").asString();
+         ObjectMapper objectMapper2 = new ObjectMapper();
+         quotesModel  =objectMapper2.readValue(quotes.getBody(), QuotesModel.class);
+         //System.out.println(quotesModel.getAuthor() + ": " + quotesModel.getContent());
 
-        HttpResponse<String> quotes = Unirest.get("https://api.quotable.io/random").asString();
-        ObjectMapper objectMapper2 = new ObjectMapper();
-        quotesModel  =objectMapper2.readValue(quotes.getBody(), QuotesModel.class);
-        //System.out.println(quotesModel.getAuthor() + ": " + quotesModel.getContent());
-
-        HttpResponse<String> numFacts = Unirest.get("http://numbersapi.com/random?json").asString();
-        ObjectMapper objectMapper3 = new ObjectMapper();
-        numFactsModel =objectMapper3.readValue(numFacts.getBody(), NumFactsModel.class);
+         HttpResponse<String> numFacts = Unirest.get("http://numbersapi.com/random?json").asString();
+         ObjectMapper objectMapper3 = new ObjectMapper();
+         numFactsModel =objectMapper3.readValue(numFacts.getBody(), NumFactsModel.class);
 //        System.out.println(numFactsModel.getText());
 
-        HttpResponse<String> catFacts = Unirest.get("https://catfact.ninja/fact").asString();
-        ObjectMapper objectMapper4 = new ObjectMapper();
-        catFactsModel =objectMapper4.readValue(catFacts.getBody(), CatFactsModel.class);
+         HttpResponse<String> catFacts = Unirest.get("https://catfact.ninja/fact").asString();
+         ObjectMapper objectMapper4 = new ObjectMapper();
+         catFactsModel =objectMapper4.readValue(catFacts.getBody(), CatFactsModel.class);
 //              System.out.println(catFactsModel.getFact());
 
-        HttpResponse<String> jokes = Unirest.get("https://official-joke-api.appspot.com/random_joke").asString();
-        ObjectMapper objectMapper5 = new ObjectMapper();
-        jokesModel = objectMapper5.readValue(jokes.getBody(), JokesModel.class);
+         HttpResponse<String> jokes = Unirest.get("https://official-joke-api.appspot.com/random_joke").asString();
+         ObjectMapper objectMapper5 = new ObjectMapper();
+         jokesModel = objectMapper5.readValue(jokes.getBody(), JokesModel.class);
 //        System.out.println(jokesModel.getSetup() + " " + jokesModel.getPunchline());
+
+     }catch (Exception e){
+         e.printStackTrace();
+     }
+ }).start();
 
     }
 
@@ -98,6 +102,35 @@ public class InfoBot extends TelegramLongPollingBot {
             sendMessage.setText(firstSend);
 
 
+
+
+        }
+        for (int i = 0; i < selectedCheckBoxesToString.size() ; i++) {
+
+            if (selectedCheckBoxesToString.get(i).equals("Joke") && message.equals("Joke")) {
+                sendMessage.setText(jokesModel.getSetup() + " " + jokesModel.getPunchline());
+
+            }else if (selectedCheckBoxesToString.get(i).equals("Quote") && message.equals("Quote")) {
+                sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
+            }
+            else if (selectedCheckBoxesToString.get(i).equals("Number fact") && message.equals("Number fact")) {
+                sendMessage.setText(numFactsModel.getText());
+            }
+            else if (selectedCheckBoxesToString.get(i).equals("Cat fact") && message.equals("Cat fact")) {
+                sendMessage.setText(catFactsModel.getFact());
+            }
+            else if (selectedCheckBoxesToString.get(i).equals("Country") && message.equals("Country")) {
+                sendMessage.setText("Please send a alpha code of a country (For example: ISR for Israel.)");
+                countryName = message;
+                if (countriesModel.getStatus() != 404){
+
+                    sendMessage.setText(countriesModel.getName() + ": capital- " + countriesModel.getCapital() + ", population- " +countriesModel.getPopulation());
+                }
+//                sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
+            }
+        }
+        send(sendMessage);
+        System.out.println("First name: " + fullName.getFirstName() + " ,last name: " + fullName.getLastName() + ". The message is: " + message);
 //            try {
 //                InlineKeyboardButton option1 = new InlineKeyboardButton();
 //                option1.setText(selectedCheckBoxesToString.get(0));
@@ -121,29 +154,6 @@ public class InfoBot extends TelegramLongPollingBot {
 //            }catch (Exception e){
 //                e.printStackTrace();
 //            }
-
-
-        }
-        for (int i = 0; i < selectedCheckBoxesToString.size() ; i++) {
-
-            if (selectedCheckBoxesToString.get(i).equals("Joke") && message.equals("Joke")) {
-                    sendMessage.setText(jokesModel.getSetup() + " " + jokesModel.getPunchline());
-
-            }else if (selectedCheckBoxesToString.get(i).equals("Quote") && message.equals("Quote")) {
-                    sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
-            }
-            else if (selectedCheckBoxesToString.get(i).equals("Number fact") && message.equals("Number fact")) {
-                sendMessage.setText(numFactsModel.getText());
-            }
-            else if (selectedCheckBoxesToString.get(i).equals("Cat fact") && message.equals("Cat fact")) {
-                sendMessage.setText(catFactsModel.getFact());
-            }
-//            else if (selectedCheckBoxesToString.get(i).equals("Country") && message.equals("Country")) {
-//                sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
-//            }
-        }
-        send(sendMessage);
-        System.out.println("First name: " + fullName.getFirstName() + " ,last name: " + fullName.getLastName() + ". The message is: " + message);
 
         if (userMessageCounts.containsKey(chatId)) {
             int count = userMessageCounts.get(chatId);
