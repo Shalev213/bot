@@ -16,6 +16,7 @@ public class StartWindow extends JFrame {
     private InfoBot infoBot;
     private JPanel jPanel;
     private JLabel activeUser = new JLabel();
+    private JLabel popularApi = new JLabel();
     private JLabel users = new JLabel();
     private JLabel requests = new JLabel();
     private String activeName;
@@ -138,10 +139,15 @@ public class StartWindow extends JFrame {
                         users.setBounds(230, 140, 50, 50);
                         users.setFont(new Font("Arial", Font.BOLD, 20));
 
-                        activeUser.setText(infoBot.getActiveUserName()); // Set the text to the active user's name
+                        activeUser.setText(infoBot.getActiveUserName());
                         activeUser.setBounds(230, 200, 150, 50);
                         activeUser.setFont(new Font("Arial", Font.BOLD, 20));
 
+                        popularApi.setText(infoBot.getPopularActivity());
+                        popularApi.setBounds(260, yGroup+60*3, 250, 50);
+                        popularApi.setFont(new Font("Arial", Font.BOLD, 20));
+
+                        jPanel.add(popularApi);
                         jPanel.add(activeUser);
                         jPanel.add(users);
                         jPanel.add(requests);
@@ -149,9 +155,8 @@ public class StartWindow extends JFrame {
                     }
                 });
 
-
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);

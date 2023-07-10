@@ -1,8 +1,5 @@
 package org.example;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;

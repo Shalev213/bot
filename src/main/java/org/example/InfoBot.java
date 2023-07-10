@@ -10,13 +10,13 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
-import java.util.List;
 
 public class InfoBot extends TelegramLongPollingBot {
     private int callsCounter = 0;
     private int uniqueUserCounter = 0;
     private User fullName;
     private String message;
+    private Queue<String> messages;
     private Map<Long, Integer> userMessageCounts;
     private Map<Long,Integer> uniqueUserMap;
     private Integer numOfMessage;
@@ -29,14 +29,19 @@ public class InfoBot extends TelegramLongPollingBot {
     private String activeUserName ="No one";
     private Long chatId;
     private  String countryName ="ISR";
+    private Map<Long,Integer> levelsMap;
+    private int countJoke;
+    private int countCountry;
+    private int countQuote;
+    private int countCatFact;
+    private int countNumFact;
+    private Map<Integer, Integer> countApiMap;
+    private String popularActivity = "Nothing ";
+    private List<String> namesApi = List.of("Joke", "Quote", "Number fact", "Cat fact", "Country");
     private final static List<String> selectedCheckBoxesToString = new ArrayList<>();
 
-    public static List<String> getSelectedCheckBoxesToString(){
-        return selectedCheckBoxesToString;
-    }
-
-
-    public InfoBot() throws Exception{
+    public InfoBot() {
+        this.countApiMap = new HashMap<>();
         this.uniqueUserMap = new HashMap<>();
         this.userMessageCounts = new HashMap<>();
  new Thread(()-> {
@@ -73,22 +78,25 @@ public class InfoBot extends TelegramLongPollingBot {
 
     }
 
+    public static List<String> getSelectedCheckBoxesToString(){
+        return selectedCheckBoxesToString;
+    }
+
     @Override
     public String getBotToken() {
         return "6275640731:AAFi_nPFeyMEu5HSXDSzqWG7p1ZJSfzswDY";
     }
-
     @Override
     public void onUpdateReceived(Update update) {
         message = update.getMessage().getText();
         fullName = update.getMessage().getFrom();
         chatId = update.getMessage().getChatId();
+        Integer date = update.getMessage().getDate();
         SendMessage sendMessage= new SendMessage();
         sendMessage.setChatId(chatId);
         numOfMessage = this.uniqueUserMap.get(chatId);
-
+        String history = "Name: " + fullName + ", message: " + message + ", date: " + date;
         String firstSend = "Hey " + fullName.getFirstName() + ", welcome to my chat!! " + "\n" + "Please choose one option to send: " + "\n '" + selectedCheckBoxesToString.get(0) + "', '" + selectedCheckBoxesToString.get(1) + "' or '" + selectedCheckBoxesToString.get(2) + "'." ;
-
         if (numOfMessage == null){
             this.uniqueUserCounter++;
             this.uniqueUserMap.put(chatId, 1);
@@ -101,59 +109,44 @@ public class InfoBot extends TelegramLongPollingBot {
             System.out.println(callsCounter);
             sendMessage.setText(firstSend);
 
-
-
-
         }
+
         for (int i = 0; i < selectedCheckBoxesToString.size() ; i++) {
 
             if (selectedCheckBoxesToString.get(i).equals("Joke") && message.equals("Joke")) {
+
+                this.countJoke++;
+                countApiMap.put(0,countJoke);
                 sendMessage.setText(jokesModel.getSetup() + " " + jokesModel.getPunchline());
 
             }else if (selectedCheckBoxesToString.get(i).equals("Quote") && message.equals("Quote")) {
+                this.countQuote++;
+                countApiMap.put(1,countQuote);
                 sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
-            }
-            else if (selectedCheckBoxesToString.get(i).equals("Number fact") && message.equals("Number fact")) {
+//
+            }else if (selectedCheckBoxesToString.get(i).equals("Number fact") && message.equals("Number fact")) {
+                this.countNumFact++;
+                countApiMap.put(2,countNumFact);
                 sendMessage.setText(numFactsModel.getText());
+
             }
             else if (selectedCheckBoxesToString.get(i).equals("Cat fact") && message.equals("Cat fact")) {
+                this.countCatFact++;
+                countApiMap.put(3,countCatFact);
                 sendMessage.setText(catFactsModel.getFact());
+
             }
             else if (selectedCheckBoxesToString.get(i).equals("Country") && message.equals("Country")) {
+                this.countCountry++;
+                countApiMap.put(4,countCountry);
                 sendMessage.setText("Please send a alpha code of a country (For example: ISR for Israel.)");
-                countryName = message;
-                if (countriesModel.getStatus() != 404){
 
-                    sendMessage.setText(countriesModel.getName() + ": capital- " + countriesModel.getCapital() + ", population- " +countriesModel.getPopulation());
-                }
 //                sendMessage.setText(quotesModel.getAuthor() + ": " + quotesModel.getContent());
             }
         }
         send(sendMessage);
-        System.out.println("First name: " + fullName.getFirstName() + " ,last name: " + fullName.getLastName() + ". The message is: " + message);
-//            try {
-//                InlineKeyboardButton option1 = new InlineKeyboardButton();
-//                option1.setText(selectedCheckBoxesToString.get(0));
-//                option1.setCallbackData(selectedCheckBoxesToString.get(0));
-//
-//                InlineKeyboardButton option2 = new InlineKeyboardButton();
-//                option2.setText(selectedCheckBoxesToString.get(1));
-//                option2.setCallbackData(selectedCheckBoxesToString.get(1));
-//
-//                InlineKeyboardButton option3 = new InlineKeyboardButton();
-//                option3.setText(selectedCheckBoxesToString.get(2));
-//                option3.setCallbackData(selectedCheckBoxesToString.get(2));
-//
-//                List<InlineKeyboardButton> options = List.of(option1, option2, option3);
-//                List<List<InlineKeyboardButton>> keyboard = List.of(options);
-//
-//                InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-//                inlineKeyboardMarkup.setKeyboard(keyboard);
-//
-//                sendMessage.setReplyMarkup(inlineKeyboardMarkup);
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
+        System.out.println("Name: " + fullName.getFirstName() + " " + fullName.getLastName() + ", message: " + message + ", date: " + date.toString());
+//        Systema.out.println("First name: " + fullName.getFirstName() + " ,last name: " + fullName.getLastName() + ". The message is: " + message);
 
         if (userMessageCounts.containsKey(chatId)) {
             int count = userMessageCounts.get(chatId);
@@ -162,6 +155,7 @@ public class InfoBot extends TelegramLongPollingBot {
             userMessageCounts.put(chatId, 1);
         }
     }
+
     private void send (SendMessage sendMessage){
         try {
             execute(sendMessage);
@@ -178,9 +172,27 @@ public class InfoBot extends TelegramLongPollingBot {
         }
         return activeUserName;
     }
-
     public int getMessagesByUser(Long chatId) {
         return userMessageCounts.getOrDefault(chatId, 0);
+    }
+    public synchronized String getPopularActivity(){
+        int max = 0;
+        for (int i = 0; i < namesApi.size() ; i++) {
+            if (countApiMap.get(i) != null && countApiMap.get(i) > max){
+                max = countApiMap.get(i);
+                popularActivity = namesApi.get(i);
+            }
+        }
+        return popularActivity;
+    }
+    public  Queue<String> lastTenMessages(){
+
+        return null;
+
+    }
+
+    public CountriesModel getCountriesModel() {
+        return countriesModel;
     }
 
     public String getActiveUser() {
@@ -206,5 +218,23 @@ public class InfoBot extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return "info236Bot";
+    }
+//    public void displayMessagesQueue() {
+//        System.out.println("Messages from " + fullName + ":");
+//        if (!messages.isEmpty()) {
+//            for (String message : messages) {
+//                System.out.println("- " + message);
+//            }
+//        }
+//    }
+
+
+    public Queue<String> getMessagesQueue() {
+        Queue<String> messagesQueue = new LinkedList<>(messages);
+
+        while (messagesQueue.size() > 10) {
+            messagesQueue.poll();
+        }
+        return messagesQueue;
     }
 }
